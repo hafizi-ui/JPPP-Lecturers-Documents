@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JPPP Lecturer's Documents</title>
+  <meta name="description" content="Portal tandatangan dokumen Jabatan – KPTM">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2314325c'/%3E%3Cpath d='M7 21c4-1 6-9 9-9s-1 8 2 8 3-4 7-5' stroke='%23fff' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ================= LOG MASUK ================= -->
+  <section id="viewLogin" class="auth" hidden>
+    <div class="auth-hero">
+      <div class="auth-brand">
+        <span class="logo-mark" aria-hidden="true"></span>
+        <div>
+          <div class="brand-title">JPPP Lecturer's Documents</div>
+          <div class="brand-sub" data-cfg="DEPT_NAME"></div>
+        </div>
+      </div>
+      <div class="auth-copy">
+        <h1>Hantar. Semak. <span class="accent">Tandatangan.</span></h1>
+        <p>Satu tempat untuk semua dokumen yang perlukan tandatangan Ketua Jabatan: kertas kerja, minit curai, CIR dan penilaian.</p>
+        <ul class="auth-points">
+          <li><span class="pt-ico">1</span> Muat naik dokumen dalam beberapa saat</li>
+          <li><span class="pt-ico">2</span> Jejak status secara langsung</li>
+          <li><span class="pt-ico">3</span> Muat turun PDF bertandatangan dengan kod QR</li>
+        </ul>
+      </div>
+      <div class="auth-foot" data-cfg="COLLEGE"></div>
+    </div>
+
+    <div class="auth-panel">
+      <form id="loginForm" class="auth-card" autocomplete="on">
+        <h2>Log masuk</h2>
+        <p class="muted">Guna emel rasmi dan kata laluan anda.</p>
+        <div id="demoBox" class="demo-box" hidden>
+          <b>Mod Demo</b>: pangkalan data belum disambung. Cuba sebagai:
+          <div class="demo-btns">
+            <button type="button" class="btn small" data-demo="kj@demo.my">Ketua Jabatan</button>
+            <button type="button" class="btn small" data-demo="pensyarah@demo.my">Pensyarah</button>
+          </div>
+        </div>
+        <label for="lgEmail">Emel</label>
+        <input type="email" id="lgEmail" required autocomplete="username" placeholder="nama@kptm.edu.my">
+        <label for="lgPass">Kata laluan</label>
+        <div class="pw-wrap">
+          <input type="password" id="lgPass" required autocomplete="current-password" placeholder="••••••••">
+          <button type="button" class="pw-toggle" data-toggle="lgPass" aria-label="Tunjuk kata laluan">Tunjuk</button>
+        </div>
+        <div id="loginErr" class="form-err" role="alert"></div>
+        <button class="btn primary block" id="btnLogin" type="submit">Log masuk</button>
+        <p class="muted tiny center">Terlupa kata laluan? Hubungi Ketua Jabatan untuk set semula.</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ================= TUKAR KATA LALUAN ================= -->
+  <section id="viewChangePw" class="center-screen" hidden>
+    <form id="pwForm" class="auth-card">
+      <h2>Tukar kata laluan</h2>
+      <p class="muted" id="pwNote">Sila tukar kata laluan sementara anda sebelum meneruskan.</p>
+      <label for="pwOld">Kata laluan semasa / sementara</label>
+      <input type="password" id="pwOld" required autocomplete="current-password">
+      <label for="pwNew">Kata laluan baharu</label>
+      <input type="password" id="pwNew" required minlength="8" autocomplete="new-password">
+      <div class="pw-meter"><span id="pwMeter"></span></div>
+      <p class="muted tiny">Sekurang-kurangnya 8 aksara, dengan huruf dan nombor.</p>
+      <label for="pwNew2">Ulang kata laluan baharu</label>
+      <input type="password" id="pwNew2" required autocomplete="new-password">
+      <div id="pwErr" class="form-err" role="alert"></div>
+      <div class="row">
+        <button type="button" class="btn ghost" id="btnPwCancel" hidden>Batal</button>
+        <span class="spacer"></span>
+        <button class="btn primary" id="btnPw" type="submit">Simpan kata laluan</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ================= BAR ATAS (selepas log masuk) ================= -->
+  <header id="topbar" class="topbar" hidden>
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="logo-mark sm" aria-hidden="true"></span>
+        <div>
+          <div class="brand-title">JPPP Lecturer's Documents</div>
+          <div class="brand-sub" data-cfg="DEPT_NAME"></div>
+        </div>
+      </div>
+      <nav class="tabs" id="tabs" hidden>
+        <button data-t="pending" class="on">Perlu Tandatangan <span class="n" id="n-pending">0</span></button>
+        <button data-t="returned">Dikembalikan <span class="n" id="n-returned">0</span></button>
+        <button data-t="done">Selesai <span class="n" id="n-done">0</span></button>
+        <button data-t="all">Semua</button>
+        <button data-t="settings">Tetapan</button>
+      </nav>
+      <div class="user-menu">
+        <button class="user-btn" id="userBtn" aria-haspopup="true">
+          <span class="avatar" id="avatar"></span>
+          <span class="user-txt"><b id="userName"></b><small id="userRole"></small></span>
+        </button>
+        <div class="menu" id="userMenu" hidden>
+          <button id="mnPw">Tukar kata laluan</button>
+          <button id="mnLogout">Log keluar</button>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div id="demoRibbon" class="demo-ribbon" hidden>Mod Demo: data contoh sahaja, tiada yang disimpan.</div>
+
+  <!-- ================= PENSYARAH ================= -->
+  <main id="viewLecturer" class="page" hidden>
+    <div class="page-head">
+      <div>
+        <h1 class="greet">Salam, <span id="lcName"></span></h1>
+        <p class="muted">Hantar dokumen untuk tandatangan Ketua Jabatan dan jejak statusnya di sini.</p>
+      </div>
+    </div>
+
+    <div class="stats" id="lcStats"></div>
+
+    <div class="layout-2">
+      <section class="card">
+        <div class="card-head"><h2>Hantar dokumen baharu</h2></div>
+        <form id="submitForm" autocomplete="off">
+          <label for="sJenis">Jenis dokumen *</label>
+          <select id="sJenis" required></select>
+          <div class="grid2">
+            <div>
+              <label for="sDue">Tarikh perlu *</label>
+              <input type="date" id="sDue" required>
+            </div>
+            <div>
+              <label for="sTajuk">Tajuk / tujuan *</label>
+              <input type="text" id="sTajuk" maxlength="300" required placeholder="cth. Quiz 1 PHR3093">
+            </div>
+          </div>
+          <label for="sCatatan">Catatan kepada KJ (pilihan)</label>
+          <textarea id="sCatatan" maxlength="1000" placeholder="cth. Tandatangan di ruang 'Verified by', muka surat 7"></textarea>
+          <label>Fail *</label>
+          <label class="dropzone" id="dropzone" for="sFile">
+            <input type="file" id="sFile" accept=".pdf,.doc,.docx,.xls,.xlsx" required>
+            <span class="dz-ico" aria-hidden="true"></span>
+            <span class="dz-main" id="dzText">Seret fail ke sini atau <u>pilih fail</u></span>
+            <span class="dz-sub">PDF, Word atau Excel · maks <span id="maxmb">10</span>MB · PDF lebih disyorkan</span>
+          </label>
+          <div class="row form-actions">
+            <span id="submitMsg" class="muted"></span>
+            <span class="spacer"></span>
+            <button class="btn primary" id="btnSubmit" type="submit">Hantar dokumen</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>Permohonan saya</h2>
+          <button class="btn small ghost" id="btnReloadMine">Muat semula</button>
+        </div>
+        <div id="myList" class="req-list"><div class="empty">Memuatkan…</div></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ================= KETUA JABATAN ================= -->
+  <main id="viewHod" class="page" hidden>
+    <div id="hodList">
+      <div class="page-head">
+        <div>
+          <h1 class="greet">Selamat datang, <span id="hodName"></span></h1>
+          <p class="muted" id="hodSummary"></p>
+        </div>
+      </div>
+      <div class="stats" id="hodStats"></div>
+      <div class="alert warn" id="noSig" hidden>Tandatangan belum dimuat naik. <a href="#" id="goSettings">Pergi ke Tetapan</a> untuk muat naik atau lukis tandatangan anda.</div>
+
+      <section class="card">
+        <div class="toolbar">
+          <select id="fJenis"><option value="">Semua jenis</option></select>
+          <input type="search" id="fQ" placeholder="Cari nama, tajuk, rujukan…">
+          <span class="spacer"></span>
+          <button class="btn small ghost" id="btnReloadAll">Muat semula</button>
+        </div>
+        <div class="batchbar" id="batchbar">
+          <span><b id="selCount">0</b> dipilih</span>
+          <button class="btn small success" id="btnOpenBatch">Tandatangan pilihan</button>
+          <button class="btn small ghost" id="btnClearSel">Batal pilihan</button>
+        </div>
+        <div id="list"><div class="empty">Memuatkan…</div></div>
+      </section>
+    </div>
+
+    <div id="hodSettings" hidden>
+      <div class="page-head"><div><h1 class="greet">Tetapan</h1><p class="muted">Tandatangan, jenis dokumen dan senarai pensyarah.</p></div></div>
+      <section class="card">
+        <div class="card-head"><h2>Tandatangan & cop</h2></div>
+        <div class="grid2">
+          <div>
+            <label>Tandatangan semasa</label>
+            <div class="checker" id="sigPrev"><span class="muted">Tiada</span></div>
+            <label for="sigFile">Muat naik gambar tandatangan (PNG/JPG)</label>
+            <input type="file" id="sigFile" accept="image/*">
+            <label class="check"><input type="checkbox" id="sigClean" checked> Buang latar putih & potong ruang kosong</label>
+          </div>
+          <div>
+            <label>…atau lukis terus (telefon/tablet)</label>
+            <canvas id="pad"></canvas>
+            <div class="row">
+              <button class="btn small ghost" id="btnPadClear">Padam</button>
+              <button class="btn small primary" id="btnPadSave">Simpan sebagai tandatangan</button>
+            </div>
+          </div>
+        </div>
+        <hr class="sep">
+        <div class="grid2">
+          <div>
+            <label>Cop jabatan / blok nama (pilihan)</label>
+            <div class="checker" id="stampPrev"><span class="muted">Tiada</span></div>
+            <input type="file" id="stampFile" accept="image/*">
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>Jenis dokumen & kedudukan tandatangan</h2></div>
+        <p class="muted small-txt">Portal mencari <b>kata kunci</b> dalam PDF (cth. "Verified by") dan meletakkan tandatangan secara automatik. dx/dy ialah jarak (pt) dari kata kunci; dy positif bermaksud ke bawah.</p>
+        <div id="dtList" class="table-wrap"></div>
+        <button class="btn small ghost" id="btnAddDt">+ Tambah jenis</button>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>Pensyarah (<span id="staffCount">0</span>)</h2></div>
+        <label for="staffBulk">Tambah pukal: satu baris seorang, <code>Nama, emel, No Staf</code> (boleh salin dari Excel). Kata laluan sementara akan diemelkan automatik.</label>
+        <textarea id="staffBulk" rows="5" placeholder="Ahmad bin Ali, ahmad@kptm.edu.my, K1234&#10;Siti binti Abu, siti@kptm.edu.my, K5678"></textarea>
+        <div class="row"><button class="btn primary small" id="btnAddStaff">Tambah pensyarah</button><span id="staffMsg" class="muted"></span></div>
+        <div id="staffList" class="table-wrap"></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ================= SKRIN SEMAKAN ================= -->
+  <div id="vReview" class="review" hidden>
+    <div id="pages" class="review-pages"></div>
+    <aside class="review-side">
+      <div class="side-head">
+        <div>
+          <div class="muted tiny">No. rujukan</div>
+          <h3 id="rvRef"></h3>
+        </div>
+        <button class="btn small ghost" id="btnCloseReview" aria-label="Tutup">✕ Tutup</button>
+      </div>
+      <div id="rvBadge"></div>
+      <div class="kv" id="rvInfo"></div>
+      <div id="rvHint" class="hint" hidden></div>
+      <div class="opts" id="rvOpts">
+        <label class="check"><input type="checkbox" id="oDate" checked> Letak tarikh</label>
+        <label class="check"><input type="checkbox" id="oQr" checked> Letak QR semakan & no. rujukan</label>
+        <label class="check" id="oStampWrap"><input type="checkbox" id="oStamp"> Letak cop / blok nama</label>
+        <label class="check"><input type="checkbox" id="oRemember"> Ingat kedudukan ini untuk jenis dokumen ini</label>
+      </div>
+      <div id="rvSigned" class="side-signed" hidden>
+        <div id="rvSignedInfo" class="dl-window"></div>
+        <div class="row">
+          <button class="btn small ghost" id="btnDlHod">Muat turun PDF</button>
+          <button class="btn small primary" id="btnExtend">Lanjutkan 7 hari</button>
+        </div>
+      </div>
+      <div class="side-actions" id="rvActions">
+        <button class="btn success big" id="btnSign">✔ Tandatangan</button>
+        <button class="btn warn" id="btnReturn">↩ Kembalikan</button>
+        <button class="btn danger" id="btnReject">✕ Tolak</button>
+        <button class="btn ghost wide" id="btnNext">Seterusnya ▶</button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ================= MODAL ================= -->
+  <div class="modal-bg" id="mPdpa">
+    <div class="modal">
+      <h3>Notis Privasi (PDPA 2010)</h3>
+      <p>Portal ini menyimpan nama, emel dan dokumen yang anda hantar semata-mata untuk proses semakan dan tandatangan Ketua Jabatan. Fail disimpan dalam Google Drive jabatan dan hanya boleh diakses oleh anda dan Ketua Jabatan. Setiap tindakan direkodkan untuk audit.</p>
+      <p>Jangan muat naik dokumen peribadi yang tidak berkaitan (cth. salinan IC) kecuali diperlukan.</p>
+      <div class="row"><span class="spacer"></span><button class="btn primary" id="btnPdpa">Saya faham</button></div>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="mResub">
+    <div class="modal">
+      <h3>Hantar semula <span id="resubRef"></span></h3>
+      <div class="alert warn" id="resubKomen"></div>
+      <label for="resubFile">Fail yang telah dibetulkan *</label>
+      <input type="file" id="resubFile" accept=".pdf,.doc,.docx,.xls,.xlsx">
+      <label for="resubCatatan">Catatan (pilihan)</label>
+      <textarea id="resubCatatan"></textarea>
+      <div class="row"><span class="spacer"></span>
+        <button class="btn ghost" data-close="mResub">Batal</button>
+        <button class="btn primary" id="btnResub">Hantar semula</button></div>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="mDecide">
+    <div class="modal">
+      <h3 id="decTitle"></h3>
+      <p class="muted tiny">Pilih sebab pantas atau tulis komen sendiri.</p>
+      <div class="chips" id="decChips"></div>
+      <textarea id="decKomen" placeholder="Komen kepada pensyarah"></textarea>
+      <div class="row"><span class="spacer"></span>
+        <button class="btn ghost" data-close="mDecide">Batal</button>
+        <button class="btn primary" id="btnDecide">Hantar</button></div>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="mBatch">
+    <div class="modal wide">
+      <h3>Tandatangan pukal</h3>
+      <p class="muted">Semak kedudukan tandatangan pada setiap dokumen. Dokumen yang tidak ditanda perlu disemak satu per satu.</p>
+      <div id="bGrid" class="bgrid"></div>
+      <div class="row"><span id="bMsg" class="muted"></span><span class="spacer"></span>
+        <button class="btn ghost" id="btnBatchCancel" data-close="mBatch">Batal</button>
+        <button class="btn success" id="btnBatch" disabled>Tandatangan</button></div>
+    </div>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <div id="boot" class="boot"><span class="spinner"></span></div>
+
+  <script src="config.js"></script>
+  <script src="common.js"></script>
+  <script src="demo.js"></script>
+  <script src="lecturer.js"></script>
+  <script src="hod.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

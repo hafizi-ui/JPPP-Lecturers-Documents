@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Semakan Dokumen – JPPP Lecturer's Documents</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2314325c'/%3E%3Cpath d='M7 21c4-1 6-9 9-9s-1 8 2 8 3-4 7-5' stroke='%23fff' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="verify-page">
+  <main class="verify">
+    <div class="verify-brand">
+      <span class="logo-mark" aria-hidden="true"></span>
+      <div>
+        <div class="brand-title">Semakan Ketulenan Dokumen</div>
+        <div class="brand-sub" data-cfg="COLLEGE"></div>
+      </div>
+    </div>
+
+    <section class="card verify-card" id="box">
+      <div class="loading-doc"><span class="spinner"></span> Menyemak dokumen…</div>
+    </section>
+
+    <section class="card" id="fileCheck" hidden>
+      <h2>Semak fail PDF (pilihan)</h2>
+      <p class="muted small-txt">Pilih salinan PDF yang anda terima. Portal akan pastikan fail itu tidak diubah selepas ditandatangani.</p>
+      <label class="dropzone" for="pdf">
+        <input type="file" id="pdf" accept="application/pdf">
+        <span class="dz-ico" aria-hidden="true"></span>
+        <span class="dz-main">Pilih fail PDF</span>
+        <span class="dz-sub">Fail tidak dimuat naik ke mana-mana; semakan dibuat dalam pelayar anda</span>
+      </label>
+      <div id="fileRes"></div>
+    </section>
+
+    <p class="verify-foot"><a href="./">← Portal Tandatangan Jabatan</a></p>
+  </main>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="config.js"></script>
+  <script src="common.js"></script>
+  <script src="demo.js"></script>
+  <script>
+    (function () {
+      var $ = P.$, esc = P.esc;
+      var ref = (new URLSearchParams(location.search).get('ref') || '').replace(/[^A-Za-z0-9-]/g, '');
+      var INFO = null;
+      if (!ref) { $('box').innerHTML = '<div class="verify-state bad"><div class="vs-ico">!</div><h2>Tiada no. rujukan</h2><p>Imbas kod QR pada dokumen untuk menyemak.</p></div>'; return; }
+      P.api('verify', { ref: ref }).then(function (d) {
+        INFO = d;
+        if (!d.found) {
+          $('box').innerHTML = '<div class="verify-state bad"><div class="vs-ico">✕</div><h2>Tidak sah / tidak dijumpai</h2>' +
+            '<p>Tiada dokumen bertandatangan dengan rujukan <b>' + esc(ref) + '</b>.</p></div>';
+          return;
+        }
+        $('box').innerHTML = '<div class="verify-state ok"><div class="vs-ico">✔</div><h2>Dokumen SAH</h2>' +
+          '<p>Dokumen ini telah ditandatangani secara elektronik melalui Portal Tandatangan Jabatan.</p></div>' +
+          '<dl class="dl">' +
+          '<dt>No. rujukan</dt><dd><b>' + esc(d.ref) + '</b></dd>' +
+          '<dt>Dokumen</dt><dd>' + esc(d.tajuk) + '</dd>' +
+          '<dt>Jenis</dt><dd>' + esc(d.jenis) + '</dd>' +
+          '<dt>Pemohon</dt><dd>' + esc(d.nama) + '</dd>' +
+          '<dt>Ditandatangani oleh</dt><dd>' + esc(d.oleh) + '<small>Ketua Jabatan</small></dd>' +
+          '<dt>Tarikh & masa</dt><dd>' + P.fmtDT(d.ditandatanganiPada) + '</dd>' +
+          '<dt>Jabatan</dt><dd>' + esc(d.dept) + '<small>' + esc(d.college) + '</small></dd>' +
+          '</dl><div class="hash"><span>SHA-256</span>' + esc(d.sha256 || '–') + '</div>';
+        P.show('fileCheck', true);
+      }).catch(function (e) { $('box').innerHTML = '<div class="verify-state bad"><div class="vs-ico">!</div><h2>Ralat</h2><p>' + esc(e.message) + '</p></div>'; });
+
+      $('pdf').addEventListener('change', function () {
+        var f = this.files[0], res = $('fileRes');
+        if (!f || !INFO) return;
+        f.arrayBuffer().then(function (buf) { return crypto.subtle.digest('SHA-256', buf); }).then(function (h) {
+          var hex = Array.prototype.map.call(new Uint8Array(h), function (b) { return ('0' + b.toString(16)).slice(-2); }).join('');
+          var same = hex === INFO.sha256;
+          res.innerHTML = '<div class="alert ' + (same ? 'ok' : 'bad') + '">' + (same
+            ? '✔ Fail ini <b>sama</b> dengan salinan asal yang ditandatangani.'
+            : '✕ Fail ini <b>berbeza</b> daripada salinan yang ditandatangani. Ia mungkin telah diubah atau dicetak semula.') + '</div>';
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
